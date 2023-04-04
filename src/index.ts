@@ -1,5 +1,5 @@
 #! /usr/bin/env node
 
-import program from "./cli/index";
+import program from "./cli/cli";
 
 program.parse();

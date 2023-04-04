@@ -2,8 +2,9 @@
   "name": "create-genezio-app",
   "version": "1.0.0",
   "description": "Start a full-stack genezio app",
-  "main": "index.ts",
+  "main": "src/index.ts",
   "scripts": {
+    "build": "npx tsc && npm install -g",
     "test": "jest"
   },
   "author": "genezio",
@@ -19,6 +20,12 @@
     "node": ">= 14"
   },
   "dependencies": {
-    "commander": "~10.0.0"
+    "commander": "~10.0.0",
+    "inquirer": "~8.2.5",
+    "process": "~0.11.10",
+    "readline": "~1.3.0"
+  },
+  "devDependencies": {
+    "@types/inquirer": "~9.0.3"
   }
 }
