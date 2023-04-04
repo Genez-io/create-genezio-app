@@ -1,0 +1,24 @@
+{
+  "name": "create-genezio-app",
+  "version": "1.0.0",
+  "description": "Start a full-stack genezio app",
+  "main": "index.ts",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "genezio",
+  "license": "GPL-3",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Genez-io/create-genezio-app.git"
+  },
+  "bin": {
+    "create-genezio-app": "./build/index.js"
+  },
+  "engines": {
+    "node": ">= 14"
+  },
+  "dependencies": {
+    "commander": "~10.0.0"
+  }
+}
