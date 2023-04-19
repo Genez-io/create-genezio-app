@@ -7,7 +7,7 @@
     "copy-non-ts-files": "copyfiles -a -u 1 \"src/templates/basic/**/*\" \"build/\"",
     "clean": "rimraf build",
     "build": "npx tsc && npm run copy-non-ts-files && npm install -g",
-    "lint": "eslint . --report-unused-disable-directives",
+    "lint": "eslint src/ --max-warnings=0",
     "test": "jest",
     "release": "npm run build && npm publish"
   },

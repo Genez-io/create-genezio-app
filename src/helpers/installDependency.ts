@@ -10,7 +10,7 @@ export async function installDependencies(projectOptions: CreateProjectOptions) 
 
     switch (projectOptions.packageManager) {
         case "npm":
-            const subprocess = await execa("npm", ["install"], {
+            await execa("npm", ["install"], {
                 cwd: path.join(process.cwd(), projectOptions.projectName, "server"),
                 stderr: "inherit",
             });

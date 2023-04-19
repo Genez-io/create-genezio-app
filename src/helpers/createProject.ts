@@ -126,7 +126,7 @@ export async function createProject(projectOptions: CreateProjectOptions) {
         index_class_path: path.join(".", "server", "task" + "." + backendLanguageExtension),
         index_class_type: "jsonrpc",
     }
-    var genezioYamlRendered = Mustache.render(genezioYamlMustacheTemplate, view);
+    const genezioYamlRendered = Mustache.render(genezioYamlMustacheTemplate, view);
     fs.writeFileSync(path.join(projectDirectory, "genezio.yaml"), genezioYamlRendered);
     spinner.succeed(`genezio.yaml ${chalk.green("created successfully!")}\n`);
 }
