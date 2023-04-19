@@ -1,6 +1,6 @@
 import inquirer from 'inquirer';
-import { validateAppName } from '../utils/validateAppName';
-import { DEFAULT_APP_NAME, LANGUAGES_LONG, Q_APP_NAME, Q_BACKEND_PROGRAMMING_LANGUAGE, Q_GIT } from '../consts';
+import { validateAppName } from '../utils/validateAppName.js';
+import { DEFAULT_APP_NAME, FRONTEND_FRAMEWORKS, LANGUAGES_LONG, Q_APP_NAME, Q_BACKEND_PROGRAMMING_LANGUAGE, Q_FRONTEND_FRAMEWORK, Q_FRONTEND_PROGRAMMING_LANGUAGE, Q_GIT, Q_OVERWRITE_DIRECTORY } from '../consts.js';
 
 export async function promptAppName() {
     const answers = await inquirer.prompt([
@@ -60,7 +60,7 @@ export async function promptFrontendLanguage() {
         {
             name: "frontendLanguage",
             type: "list",
-            message: Q_BACKEND_PROGRAMMING_LANGUAGE,
+            message: Q_FRONTEND_PROGRAMMING_LANGUAGE,
             choices: LANGUAGES_LONG,
         }
     ])
@@ -77,6 +77,30 @@ export async function promptFrontendLanguage() {
     });
 
     return answers.frontendLanguage;
+}
+
+export async function promptFrontendFramework() {
+    const answers = await inquirer.prompt([
+        {
+            name: "frontendFramework",
+            type: "list",
+            message: Q_FRONTEND_FRAMEWORK,
+            choices: FRONTEND_FRAMEWORKS,
+        }
+    ])
+    .then((answers) => {
+        return answers;
+    })
+    .catch((error) => {
+        if (error.isTtyError) {
+            // Prompt couldn't be rendered in the current environment
+            throw new Error("Prompt couldn't be rendered in the current environment")
+        } else {
+            throw new Error(error)
+        }
+    });
+
+    return answers.frontendFramework;
 }
 
 export async function promptInitGit() {
@@ -101,4 +125,28 @@ export async function promptInitGit() {
     });
 
     return answers.git;
+}
+
+export async function promptOverwriteProject() {
+    const answers = await inquirer.prompt([
+        {
+            name: "overwriteDirectory",
+            type: "confirm",
+            message: Q_OVERWRITE_DIRECTORY,
+            default: false,
+        }
+    ])
+    .then((answers) => {
+        return answers;
+    })
+    .catch((error) => {
+        if (error.isTtyError) {
+            // Prompt couldn't be rendered in the current environment
+            throw new Error("Prompt couldn't be rendered in the current environment")
+        } else {
+            throw new Error(error)
+        }
+    });
+
+    return answers.overwrite;
 }

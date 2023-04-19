@@ -1,4 +1,5 @@
 
+import log from "loglevel";
 import path from "path";
 
 // Regex to check for lowercase letters, numbers, dashes and underlines
@@ -11,7 +12,7 @@ export async function validateAppName(input: string) {
 
     // Check if appName contains only lowercase letters, numbers, dashes and underlines
     if (!validRegexExp.test(appName) && input !== ".") {
-        console.log("Please enter a valid app name. It can only contain lowercase letters, numbers, dashes and underlines.");
+        log.error("Please enter a valid app name. It can only contain lowercase letters, numbers, dashes and underlines.");
         return false;
     }
     return true;

@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "target": "es6",
-        "module": "commonjs",
+        "module": "es2020",
         "lib": [
             "es6"
         ],
@@ -10,10 +10,12 @@
         "strict": true,
         "noImplicitAny": true,
         "esModuleInterop": true,
+        "moduleResolution": "node16",
         "resolveJsonModule": true
     },
     "ts-node": {
         "esm": true
     },
     "include": ["src/**/*"],
+    "exclude": ["src/templates/**/*"]
 }

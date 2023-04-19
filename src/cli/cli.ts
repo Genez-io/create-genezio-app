@@ -1,12 +1,11 @@
 import { Command, CommanderError } from "commander";
 import { exit } from "process";
-import { CREATE_GENEZIO_APP } from "../consts";
-import { promptAppName, promptBackendLanguage, promptFrontendLanguage, promptInitGit } from "./prompts";
-import { createProject } from "../helpers/createProject";
-import { initGitRepository } from "../helpers/initGitRepository";
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const pjson = require("../../package.json");
+import { CREATE_GENEZIO_APP } from "../consts.js";
+import { promptAppName, promptBackendLanguage, promptFrontendFramework, promptFrontendLanguage, promptInitGit } from "./prompts.js";
+import { createProject } from "../helpers/createProject.js";
+import { initGitRepository } from "../helpers/initGitRepository.js";
+import { installDependencies } from "../helpers/installDependency.js";
+import log from "loglevel";
 
 const program = new Command().name(CREATE_GENEZIO_APP);
 
@@ -16,56 +15,88 @@ program
     if (err.code === "commander.help" || err.code === "commander.version" || err.code === "commander.helpDisplayed") {
       exit(0);
     } else {
-      console.log(`Type '${CREATE_GENEZIO_APP} --help'.`);
+      log.error(`Type '${CREATE_GENEZIO_APP} --help'.`);
     }
   })
   .addHelpText("afterAll", " If you have any problems, do not hesitate to file an issue at: https://github.com/genez-io/create-genezio-app/issues/new")
   .argument("[project-directory]", "The name of the application as well as the name of the directory it will be created in.")
-  .version(pjson.version)
+  .version("1.0.0")
   .option("--default", "use default values for all questions")
   .option("-b, --backend-language <backend-language>", "set the programming language of your backend")
   .option("-f, --frontend-language <frontend-language>", "set the programming language of your frontend")
   .action(async (projectDirectory: string, options: { default: boolean; frontendLanguage: string; backendLanguage: string }) => {
     if (options.default) {
-       console.log("Use default values for all questions.");
+       log.info("Use default values for all questions.");
     } else {
         // Retrieve user preferences
        if (!projectDirectory) {
             const appName = await promptAppName()
             .catch((error) => {
-                console.log(error);
+                log.error(error);
             });
-            console.log(`Creating your project in ${appName}.`);
+            log.info(`Creating your project in ${appName}.`);
+            projectDirectory = appName;
         }
 
-        const backendLanguage = await promptBackendLanguage().catch((error) => {
-            console.log(error);
+        const backendLanguage:string = await promptBackendLanguage().catch((error) => {
+            log.error(error);
         });
-        console.log(`Using ${backendLanguage} as backend language.`);
+        log.info(`Using ${backendLanguage} as backend language.`);
 
-        const frontendLanguage = await promptFrontendLanguage().catch((error) => {
-            console.log(error);
+        const frontendLanguage:string = await promptFrontendLanguage().catch((error) => {
+            log.error(error);
         });
-        console.log(`Using ${frontendLanguage} as frontend language.`);
+        log.info(`Using ${frontendLanguage} as frontend language.`);
+
+        let frontendFramework = "none";
+        if (frontendLanguage.toLowerCase() === "typescript" || frontendLanguage.toLowerCase() === "javascript") {
+            frontendFramework = await promptFrontendFramework().catch((error) => {
+                log.error(error);
+            });
+            log.info(`Using ${frontendFramework} as frontend framework.`);
+        }
 
         const initGit = await promptInitGit().catch((error) => {
-            console.log(error);
+            log.error(error);
         });
         if (initGit) {
-            console.log("Initializing git repository.");
+            log.info("Initializing git repository.");
         } else {
-            console.log("Not initializing git repository. You can do this later by running `git init` in your project directory.");
+            log.info("Not initializing git repository. You can do this later by running `git init` in your project directory.");
         }
 
         // Create project
-        await createProject().catch((error) => {
-            console.log(error);
+        await createProject({
+            packageManager: "npm",
+            projectName: projectDirectory,
+            backendLanguage: backendLanguage,
+            frontendLanguage: frontendLanguage,
+            frontendFramework: frontendFramework,
+        }).catch((error) => {
+            log.error(error);
+        });
+
+        // Install dependencies
+        await installDependencies({
+            packageManager: "npm",
+            projectName: projectDirectory,
+            backendLanguage: backendLanguage,
+            frontendLanguage: frontendLanguage,
+            frontendFramework: frontendFramework,
+        }).catch((error) => {
+            log.error(error);
         });
 
         // Init git repository
         if (initGit) {
-            await initGitRepository().catch((error) => {
-                console.log(error);
+            await initGitRepository({
+                packageManager: "npm",
+                projectName: projectDirectory,
+                backendLanguage: backendLanguage,
+                frontendLanguage: frontendLanguage,
+                frontendFramework: frontendFramework,
+            }).catch((error) => {
+                log.error(error);
             });
         }
     }
