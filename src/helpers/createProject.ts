@@ -7,7 +7,7 @@ import { genezioYamlMustacheTemplate } from "../templates/genezioYamlMustacheTem
 import { generateRandomSubdomain } from "../utils/generateRandomSubdomain.js";
 import { PKG_DIRECTORY } from "../consts.js";
 import { promptOverwriteProject } from "../cli/prompts.js";
-import { CreateProjectOptions } from "../types/CreateProjectOptions.js";
+import { CreateProjectOptions } from "../types/ProjectOptions.js";
 import { translateFromLongLanguagesToExtensions } from "../utils/translateFromLongLanguagesToExtensions.js";
 
 interface GenezioYamlTemplate {
@@ -27,35 +27,22 @@ interface GenezioYamlTemplate {
     index_class_type:string;
 }
 
-export async function createProject(projectOptions: CreateProjectOptions) {
+export async function createProjectFromTemplate(projectOptions: CreateProjectOptions) {
     const projectDirectory = path.join(process.cwd(), projectOptions.projectName);
 
-    const spinner = ora(`Creating project skeleton in: ${projectDirectory}...\n`).start();
+    // Create project directory - overwrite logic
+    await createProjectDirectory(projectDirectory).catch((error) => {
+        throw error;
+    });
 
-    // Create project directory
-    if (fs.existsSync(projectDirectory)) {
-        if (fs.readdirSync(projectDirectory).length === 0) {
-            spinner.info(`Creating project skeleton in: ${projectDirectory}...`);
-        } else {
-            spinner.stopAndPersist();
-            const overwriteProject = await promptOverwriteProject();
-            if (overwriteProject) {
-                spinner.fail(`Project creation aborted.`);
-                process.exit(1);
-            }
-        }
-    } else {
-        fs.mkdirSync(projectDirectory);
-    }
-    spinner.succeed(
-    `${projectOptions.projectName} ${chalk.green("created successfully!")}\n`,
-    );
+    const spinner = ora(`Creating project skeleton in: ${projectDirectory}...\n`).start();
 
     // Copy template
     spinner.info(`Copying template files...`);
     fs.copyFile(path.join(PKG_DIRECTORY, "templates", "basic", ".genezioignore"), path.join(projectDirectory, ".genezioignore"));
     fs.copyFile(path.join(PKG_DIRECTORY, "templates", "basic", ".gitignore"), path.join(projectDirectory, ".gitignore"));
     fs.copyFile(path.join(PKG_DIRECTORY, "templates", "basic", "README.md"), path.join(projectDirectory, "README.md"));
+    fs.copyFile(path.join(PKG_DIRECTORY, "templates", "basic", "tsconfig.json"), path.join(projectDirectory, "tsconfig.json"));
     spinner.succeed(`Template files ${chalk.green("copied successfully!")}\n`);
 
     // Copy server template
@@ -112,21 +99,43 @@ export async function createProject(projectOptions: CreateProjectOptions) {
     const frontendLanguageExtension = await translateFromLongLanguagesToExtensions(projectOptions.frontendLanguage);
     const view: GenezioYamlTemplate = {
         app_name: projectOptions.projectName,
-        cloud_provider: "aws",
-        region: "eu-central-1",
+        cloud_provider: projectOptions.projectConfiguration.cloudProvider,
+        region: projectOptions.projectConfiguration.region,
         sdk_language: frontendLanguageExtension,
-        sdk_runtime: "browser",
-        sdk_path: path.join(".", "client", "src", "sdk"),
-        frontend_path: path.join(".", "client", "build"),
+        sdk_runtime: projectOptions.projectConfiguration.sdkRuntime,
+        sdk_path: projectOptions.projectConfiguration.sdkPath,
+        frontend_path: projectOptions.projectConfiguration.frontendPath,
         frontend_subdomain: generateRandomSubdomain(),
-        scripts_prebackend: "",
-        scripts_postbackend: "",
-        scripts_prefrontend: "cd client && npm install && npm run build",
-        scripts_postfrontend: "",
+        scripts_prebackend: projectOptions.projectConfiguration.scripts.preBackend,
+        scripts_postbackend: projectOptions.projectConfiguration.scripts.postBackend,
+        scripts_prefrontend: projectOptions.projectConfiguration.scripts.preFrontend,
+        scripts_postfrontend: projectOptions.projectConfiguration.scripts.postFrontend,
         index_class_path: path.join(".", "server", "task" + "." + backendLanguageExtension),
-        index_class_type: "jsonrpc",
+        index_class_type: projectOptions.projectConfiguration.indexClassType,
     }
     const genezioYamlRendered = Mustache.render(genezioYamlMustacheTemplate, view);
     fs.writeFileSync(path.join(projectDirectory, "genezio.yaml"), genezioYamlRendered);
     spinner.succeed(`genezio.yaml ${chalk.green("created successfully!")}\n`);
+}
+
+async function createProjectDirectory(projectDirectory: string) {
+    const spinner = ora(`Creating project directory ${projectDirectory}...\n`).start();
+
+    if (fs.existsSync(projectDirectory)) {
+        if (fs.readdirSync(projectDirectory).length === 0) {
+            spinner.info(`Creating project skeleton in: ${projectDirectory}...`);
+        } else {
+            spinner.stopAndPersist();
+            const overwriteProject = await promptOverwriteProject();
+            if (overwriteProject) {
+                spinner.fail(`Project creation aborted.`);
+                process.exit(1);
+            }
+        }
+    } else {
+        fs.mkdirSync(projectDirectory);
+    }
+    spinner.succeed(
+    `${projectDirectory} ${chalk.green("created successfully!")}\n`,
+    );
 }

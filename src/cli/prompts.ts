@@ -1,6 +1,6 @@
 import inquirer from 'inquirer';
 import { validateAppName } from '../utils/validateAppName.js';
-import { DEFAULT_APP_NAME, FRONTEND_FRAMEWORKS, LANGUAGES_LONG, Q_APP_NAME, Q_BACKEND_PROGRAMMING_LANGUAGE, Q_FRONTEND_FRAMEWORK, Q_FRONTEND_PROGRAMMING_LANGUAGE, Q_GIT, Q_OVERWRITE_DIRECTORY } from '../consts.js';
+import { DEFAULT_PROJECT_OPTIONS, FRONTEND_FRAMEWORKS, LANGUAGES_LONG, Q_APP_NAME, Q_AUTHENTICATION, Q_BACKEND_PROGRAMMING_LANGUAGE, Q_FRONTEND_FRAMEWORK, Q_FRONTEND_PROGRAMMING_LANGUAGE, Q_GIT, Q_INSTALL_DEPENDENCIES, Q_OVERWRITE_DIRECTORY, Q_PACKAGE_MANAGER } from '../consts.js';
 
 export async function promptAppName() {
     const answers = await inquirer.prompt([
@@ -8,7 +8,7 @@ export async function promptAppName() {
             name: "appName",
             type: "input",
             message: Q_APP_NAME,
-            default: DEFAULT_APP_NAME,
+            default: DEFAULT_PROJECT_OPTIONS.projectName,
             validate: (input: string) => {
                 return validateAppName(input);
             },
@@ -38,6 +38,7 @@ export async function promptBackendLanguage() {
             type: "list",
             message: Q_BACKEND_PROGRAMMING_LANGUAGE,
             choices: LANGUAGES_LONG,
+            default: DEFAULT_PROJECT_OPTIONS.backendLanguage,
         }
     ])
     .then((answers) => {
@@ -52,7 +53,7 @@ export async function promptBackendLanguage() {
         }
     });
 
-    return answers.backendLanguage;
+    return answers.backendLanguage.toLowerCase();
 }
 
 export async function promptFrontendLanguage() {
@@ -62,6 +63,7 @@ export async function promptFrontendLanguage() {
             type: "list",
             message: Q_FRONTEND_PROGRAMMING_LANGUAGE,
             choices: LANGUAGES_LONG,
+            default: DEFAULT_PROJECT_OPTIONS.frontendLanguage,
         }
     ])
     .then((answers) => {
@@ -76,7 +78,7 @@ export async function promptFrontendLanguage() {
         }
     });
 
-    return answers.frontendLanguage;
+    return answers.frontendLanguage.toLowerCase();
 }
 
 export async function promptFrontendFramework() {
@@ -86,6 +88,7 @@ export async function promptFrontendFramework() {
             type: "list",
             message: Q_FRONTEND_FRAMEWORK,
             choices: FRONTEND_FRAMEWORKS,
+            default: DEFAULT_PROJECT_OPTIONS.frontendFramework,
         }
     ])
     .then((answers) => {
@@ -100,7 +103,56 @@ export async function promptFrontendFramework() {
         }
     });
 
-    return answers.frontendFramework;
+    return answers.frontendFramework.toLowerCase();
+}
+
+export async function promptPackageManager() {
+    const answers = await inquirer.prompt([
+        {
+            name: "packageManager",
+            type: "list",
+            message: Q_PACKAGE_MANAGER,
+            choices: ["npm", "yarn"],
+            default: DEFAULT_PROJECT_OPTIONS.packageManager,
+        }
+    ])
+    .then((answers) => {
+        return answers;
+    })
+    .catch((error) => {
+        if (error.isTtyError) {
+            // Prompt couldn't be rendered in the current environment
+            throw new Error("Prompt couldn't be rendered in the current environment")
+        } else {
+            throw new Error(error)
+        }
+    });
+
+    return answers.packageManager;
+}
+
+export async function promptAuthentication() {
+    const answers = await inquirer.prompt([
+        {
+            name: "authentication",
+            type: "confirm",
+            message: Q_AUTHENTICATION,
+            default: DEFAULT_PROJECT_OPTIONS.authentication,
+        }
+    ])
+    .then((answers) => {
+        return answers;
+    })
+    .catch((error) => {
+        if (error.isTtyError) {
+            // Prompt couldn't be rendered in the current environment
+            throw new Error("Prompt couldn't be rendered in the current environment")
+        } else {
+            throw new Error(error)
+        }
+    });
+
+    return answers.authentication;
 }
 
 export async function promptInitGit() {
@@ -109,7 +161,7 @@ export async function promptInitGit() {
             name: "git",
             type: "confirm",
             message: Q_GIT,
-            default: true,
+            default: DEFAULT_PROJECT_OPTIONS.initGit,
         }
     ])
     .then((answers) => {
@@ -125,6 +177,30 @@ export async function promptInitGit() {
     });
 
     return answers.git;
+}
+
+export async function promptInstallDependencies() {
+    const answers = await inquirer.prompt([
+        {
+            name: "installDependencies",
+            type: "confirm",
+            message: Q_INSTALL_DEPENDENCIES,
+            default: DEFAULT_PROJECT_OPTIONS.installDependencies,
+        }
+    ])
+    .then((answers) => {
+        return answers;
+    })
+    .catch((error) => {
+        if (error.isTtyError) {
+            // Prompt couldn't be rendered in the current environment
+            throw new Error("Prompt couldn't be rendered in the current environment")
+        } else {
+            throw new Error(error)
+        }
+    });
+
+    return answers.installDependencies;
 }
 
 export async function promptOverwriteProject() {

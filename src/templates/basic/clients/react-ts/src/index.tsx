@@ -5,14 +5,14 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import logo from "./background.jpg";
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
+const root = ReactDOM.createRoot(document.getElementById("root")!);
 root.render(
   <React.StrictMode>
     <App />
     <img
       style={{ width: "100%", position: "fixed", bottom: "0px", zIndex: -100 }}
       src={logo}
-    />
+    />{" "}
   </React.StrictMode>
 );
 

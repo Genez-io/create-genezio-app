@@ -2,7 +2,7 @@ import { execa } from 'execa';
 import log from "loglevel";
 import path from "path";
 import chalk from "chalk";
-import { CreateProjectOptions } from "../types/CreateProjectOptions.js";
+import { CreateProjectOptions } from "../types/ProjectOptions.js";
 
 
 export async function installDependencies(projectOptions: CreateProjectOptions) {
@@ -20,9 +20,6 @@ export async function installDependencies(projectOptions: CreateProjectOptions) 
             });
             break;
         case "yarn":
-            console.log("not implemented yet");
-            break;
-        case "pnpm":
             console.log("not implemented yet");
             break;
         default:

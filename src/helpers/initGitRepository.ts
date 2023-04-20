@@ -3,10 +3,11 @@ import { simpleGit } from "simple-git";
 import log from "loglevel";
 import path from "path";
 
-import { CreateProjectOptions } from "../types/CreateProjectOptions.js";
+import { CreateProjectOptions } from "../types/ProjectOptions.js";
 
 export async function initGitRepository(projectOptions: CreateProjectOptions) {
-    log.info("Initializing git repository...");
+    log.info("Initializing git repository.");
+
     if (!isGitInstalled()) {
         log.error("Git is not installed. Skipping git initialization.");
         return;

@@ -19,5 +19,9 @@
     },
     "include": [
         "**/*"
-    ]
+    ],
+    "exclude":[
+        "node_modules",
+        "build",
+        "client/**/*"]
 }
