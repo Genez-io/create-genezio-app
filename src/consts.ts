@@ -20,8 +20,13 @@ export const Q_OVERWRITE_DIRECTORY = 'Uh oh, it seems like the project directory
 
 // Supported programming languages
 export const LANGUAGES_SHORT: string[] = ["js", "ts", "swift", "python", "dart"];
-export const LANGUAGES_LONG: string[] = ["JavaScript", "TypeScript", "Swift", "Python", "Dart"];
-export const FRONTEND_FRAMEWORKS: string[] = ["React", "Vue", "Angular", "None"];
+export const LANGUAGES_LONG: string[] = ["JavaScript", "TypeScript"];
+export const FRONTEND_FRAMEWORKS: string[] = ["React", "None"];
+
+// These are all the languages and frameworks that we plan to support in the future
+// export const LANGUAGES_SHORT: string[] = ["js", "ts", "swift", "python", "dart"];
+// export const LANGUAGES_LONG: string[] = ["JavaScript", "TypeScript", "Swift", "Python", "Dart"];
+// export const FRONTEND_FRAMEWORKS: string[] = ["React", "Vue", "Angular", "None"];
 
 // Default values
 export const CREATE_GENEZIO_APP = 'create-genezio-app';
