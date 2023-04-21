@@ -1,5 +1,6 @@
 import {
   Button,
+  Card,
   Container,
   Row,
   Col,
@@ -8,13 +9,11 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
+  ButtonGroup
 } from "reactstrap";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Task } from "../sdk/task.sdk.js";
 import { useNavigate } from "react-router-dom";
-import TaskView from './TaskView.js'
-import uuid from 'react-uuid';
-import logo from './logo.png';
 
 
 export default (props) => {
@@ -31,27 +30,17 @@ export default (props) => {
 
   const [taskTitle, setTaskTitle] = useState("");
 
-  let initialized = false
   useEffect(() => {
-    if (!initialized) {
-      initialized = true
-      let token = localStorage.getItem("apiToken")
-      if (!token) {
-        token = uuid()
-        localStorage.setItem("apiToken", token)
+    async function fetchTasks() {
+      const res = await Task.getAllTasksByUser(
+        localStorage.getItem("apiToken"),
+        JSON.parse(localStorage.getItem("user"))._id
+      );
+      if (res.success) {
+        setTasks(res.tasks);
       }
-  
-      // eslint-disable-next-line no-inner-declarations
-      async function fetchTasks() {
-        const res = await Task.getAllTasksByUser(
-          localStorage.getItem("apiToken"),
-        );
-        if (res.success) {
-          setTasks(res.tasks);
-        }
-      }
-      fetchTasks();
     }
+    fetchTasks();
   }, []);
 
   async function handleDelete(id) {
@@ -62,7 +51,6 @@ export default (props) => {
   }
 
   async function handleEdit(id, title, solved) {
-    console.log("handle edit called", id, title, solved)
     const res = await Task.updateTask(
       localStorage.getItem("apiToken"),
       id,
@@ -89,7 +77,8 @@ export default (props) => {
     }
     const res = await Task.createTask(
       localStorage.getItem("apiToken"),
-      taskTitle
+      taskTitle,
+      JSON.parse(localStorage.getItem("user"))._id
     );
     if (res.success) {
       setTasks([...tasks, res.task]);
@@ -128,35 +117,66 @@ export default (props) => {
         </form>
       </Modal>
       <Container className="mt-2">
+			<Card className="p-4 mt-2">
 
         <Row className="mt-2">
-          <Col sm="12">
-            <Row>
-              <Col sm="2" className="mt-4">
-              </Col>
-              <Col sm="8" style={{ backgroundColor: "white" }}>
-                <div style={{ display: "flex", justifyContent: "center" }}>
-                  <img style={{width: "50px" }} src={logo} />
-                </div>
-                <h3 style={{ marginBottom: "30px", marginTop: "15px", textAlign: "center" }}>Welcome to genezio!</h3>
-                <p style={{ marginBottom: "30px", textAlign: "center" }}>You have successfully deployed your first genezio project!</p>
-                <p style={{ marginBottom: "30px", textAlign: "center" }}>Here you have a list of resources that you can use to learn how to continue building awesome projects with genezio:</p>
+          <Col sm="11">
+              <h3>All Tasks</h3>
 
-                {tasks.map((task) => (
-                  <TaskView key={task._id} task={task} onChange={handleEdit} onDelete={handleDelete}></TaskView>
-                ))}
-                <div style={{ display: "flex", justifyContent: "center", marginTop: "50px" }}>
-                  <Button outline color="secondary" onClick={() => {
-                    toggleModalAddTask();
-                  }}>Add New Task</Button>
-                </div>
-              </Col>
+              <Row>
+                <Col sm="12">
+                  {tasks.map((task) => (
+                    <div key={task._id} className="mb-3">
+                      <p className="mb-0">
+                        <span className="h4">{task.title}</span> -{" "}
+                        {task.solved ? "Solved" : "Not Solved"}
+                      </p>
+                      <ButtonGroup aria-label="Basic example">
+                        <Button
+                          color="danger"
+                          onClick={() => handleDelete(task._id)}
+                        >
+                          Delete Task
+                        </Button>
+                        <Button
+                          color="primary"
+                          onClick={() =>
+                            handleEdit(task._id, task.title, !task.solved)
+                          }
+                        >
+                          {task.solved ? "Mark as Unsolved" : "Mark as Solved"}
+                        </Button>
+                      </ButtonGroup>
+                    </div>
+                  ))}
+                </Col>
 
-              <Col sm="2" className="mt-4">
-              </Col>
-            </Row>
+                <Col sm="3" className="mt-4">
+                  <Button
+                    color="primary"
+                    onClick={() => {
+                      toggleModalAddTask();
+                    }}
+                  >
+                    Add Task
+                  </Button>
+                </Col>
+              </Row>
+          </Col>
+          <Col sm="1" className="text-right">
+            <Button
+              color="primary"
+              onClick={() => {
+                localStorage.removeItem("apiToken");
+                localStorage.removeItem("user");
+                navigate("/login");
+              }}
+            >
+              Logout
+            </Button>
           </Col>
         </Row>
+				</Card>
 
       </Container>
     </>

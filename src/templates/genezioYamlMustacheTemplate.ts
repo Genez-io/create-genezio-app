@@ -1,5 +1,5 @@
 export const genezioYamlMustacheTemplate = `name: {{app_name}}
-cloud-provider: {{cloud_provider}}
+cloudProvider: {{cloud_provider}}
 region: {{region}}
 sdk:
   language: {{sdk_language}}
@@ -10,9 +10,14 @@ frontend:
   path: {{{frontend_path}}}
   subdomain: {{frontend_subdomain}}
 scripts:
-  preFrontendDeploy: {{{scripts_prefrontend}}}
+  preBackendDeploy: {{#prebackend}} {{{scripts_prebackend}}} {{/prebackend}}
+  postBackendDeploy: {{#postbackend}} {{{scripts_postbackend}}} {{/postbackend}}
+  preFrontendDeploy: {{#prefrontend}} {{{scripts_prefrontend}}} {{/prefrontend}}
+  postFrontendDeploy: {{#postfrontend}} {{{scripts_postfrontend}}} {{/postfrontend}}
 classes:
-  - path: {{{index_class_path}}}
-    type: {{index_class_type}}
+  {{#classes}}
+  - path: {{{path}}}
+    type: {{{type}}}
     methods: []
-`
+  {{/classes}}
+`;

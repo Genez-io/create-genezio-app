@@ -19,8 +19,7 @@ export type ProjectConfigurationOptions = {
     sdkPath: string;
     frontendPath: string;
     frontendSubdomain: string
-    indexClassPath: string
-    indexClassType: ClassType;
+    classes: Class[];
     scripts: ScriptsOptions;
 }
 
@@ -29,6 +28,35 @@ export type ScriptsOptions = {
     postBackend: string;
     preFrontend: string;
     postFrontend: string;
+}
+
+export type ProjectConfigurationView = {
+    app_name: string;
+    cloud_provider: string;
+    region: string;
+    sdk_language: string;
+    sdk_runtime: string;
+    sdk_path: string;
+    frontend_path: string;
+    frontend_subdomain: string;
+    prebackend?: {
+        scripts_prebackend: string;
+    };
+    postbackend?:  {
+        scripts_postbackend: string;
+    };
+    prefrontend?: {
+        scripts_prefrontend: string;
+    };
+    postfrontend?:  {
+        scripts_postfrontend: string;
+    };
+    classes: Class[];
+}
+
+export type Class = {
+    path: string;
+    type: ClassType;
 }
 
 export enum CloudProvider {

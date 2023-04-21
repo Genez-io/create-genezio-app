@@ -9,21 +9,19 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  ButtonGroup,
+  ButtonGroup
 } from "reactstrap";
-import { useState, useEffect, SetStateAction } from "react";
-import {
-  TaskService,
-  Task,
-  GetTasksResponse,
-  CreateTaskResponse,
-} from "../sdk/taskService.sdk";
+import React, { useState, useEffect } from "react";
+import { TaskService, Task, GetTasksResponse } from "../sdk/taskService.sdk";
 import { useNavigate } from "react-router-dom";
+import { User } from "../sdk/userService.sdk";
+
 
 export default function AllTasks() {
   const navigate = useNavigate();
 
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [user, setUser] = useState<User>({name: "no name", email: "no email", _id: ""});
   const [token, setToken] = useState<string>("");
   const [modalAddTask, setModalAddTask] = useState(false);
   const toggleModalAddTask = () => {
@@ -36,17 +34,29 @@ export default function AllTasks() {
   const [taskTitle, setTaskTitle] = useState("");
 
   useEffect(() => {
-    const token = localStorage.getItem("apiToken");
-    setToken(token as SetStateAction<string>);
+    const user = localStorage.getItem("user")
+    const token = localStorage.getItem("apiToken")
+
+    if (!user || !token) {
+      navigate("/login");
+      return;
+    }
+
+    setUser(JSON.parse(localStorage.getItem("user")!))
+    setToken(token)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    TaskService.getAllTasksByUser(token).then((result: GetTasksResponse) => {
-      if (result.success) {
-        setTasks(result.tasks);
-      }
-    });
-  }, [token]);
+      TaskService.getAllTasksByUser(
+        token,
+        user._id
+      ).then((result: GetTasksResponse) => {
+        if (result.success) {
+          setTasks(result.tasks);
+        }
+      });
+  }, [user, token]);
 
   async function handleDelete(id: string) {
     const res = await TaskService.deleteTask(token, id);
@@ -56,7 +66,12 @@ export default function AllTasks() {
   }
 
   async function handleEdit(id: string, title: string, solved: boolean) {
-    const res = await TaskService.updateTask(token, id, title, solved);
+    const res = await TaskService.updateTask(
+      token,
+      id,
+      title,
+      solved
+    );
     if (res.success) {
       const newTasks = tasks.map((task) => {
         if (task._id === id) {
@@ -75,12 +90,13 @@ export default function AllTasks() {
       setError("Title is mandatory");
       return;
     }
-    const res: CreateTaskResponse = await TaskService.createTask(
+    const res = await TaskService.createTask(
       token,
-      taskTitle
+      taskTitle,
+      user._id
     );
     if (res.success) {
-      setTasks([...tasks, res.task! as Task]);
+      setTasks([...tasks, res.task!]);
       setTaskTitle("");
       toggleModalAddTask();
     }
@@ -115,9 +131,10 @@ export default function AllTasks() {
         </form>
       </Modal>
       <Container className="mt-2">
-        <Card className="p-4 mt-2">
-          <Row className="mt-2">
-            <Col sm="11">
+			<Card className="p-4 mt-2">
+
+        <Row className="mt-2">
+          <Col sm="11">
               <h3>All Tasks</h3>
 
               <Row>
@@ -159,21 +176,23 @@ export default function AllTasks() {
                   </Button>
                 </Col>
               </Row>
-            </Col>
-            <Col sm="1" className="text-right">
-              <Button
-                color="primary"
-                onClick={() => {
-                  localStorage.removeItem("apiToken");
-                  navigate("/login");
-                }}
-              >
-                Logout
-              </Button>
-            </Col>
-          </Row>
-        </Card>
+          </Col>
+          <Col sm="1" className="text-right">
+            <Button
+              color="primary"
+              onClick={() => {
+                localStorage.removeItem("apiToken");
+                localStorage.removeItem("user");
+                navigate("/login");
+              }}
+            >
+              Logout
+            </Button>
+          </Col>
+        </Row>
+				</Card>
+
       </Container>
     </>
   );
-}
+};

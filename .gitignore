@@ -127,3 +127,9 @@ dist
 
 # Ignore .env files
 **/.env*
+
+# Ignore generated sdk dires
+**/sdk
+
+# Ignore the default app name, it might be used for testing
+my-genezio-app

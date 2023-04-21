@@ -7,25 +7,8 @@ import { genezioYamlMustacheTemplate } from "../templates/genezioYamlMustacheTem
 import { generateRandomSubdomain } from "../utils/generateRandomSubdomain.js";
 import { PKG_DIRECTORY } from "../consts.js";
 import { promptOverwriteProject } from "../cli/prompts.js";
-import { CreateProjectOptions } from "../types/ProjectOptions.js";
+import { Class, CreateProjectOptions, ProjectConfigurationView } from "../types/ProjectOptions.js";
 import { translateFromLongLanguagesToExtensions } from "../utils/translateFromLongLanguagesToExtensions.js";
-
-interface GenezioYamlTemplate {
-    app_name: string;
-    cloud_provider: string;
-    region: string;
-    sdk_language: string;
-    sdk_runtime: string;
-    sdk_path: string;
-    frontend_path: string;
-    frontend_subdomain: string;
-    scripts_prebackend: string;
-    scripts_postbackend: string;
-    scripts_prefrontend: string;
-    scripts_postfrontend: string;
-    index_class_path:string;
-    index_class_type:string;
-}
 
 export async function createProjectFromTemplate(projectOptions: CreateProjectOptions) {
     const projectDirectory = path.join(process.cwd(), projectOptions.projectName);
@@ -35,15 +18,20 @@ export async function createProjectFromTemplate(projectOptions: CreateProjectOpt
         throw error;
     });
 
-    const spinner = ora(`Creating project skeleton in: ${projectDirectory}...\n`).start();
+    const spinner = ora(`Creating project directory at ${projectDirectory}...\n`).start();
 
     // Copy template
-    spinner.info(`Copying template files...`);
+    spinner.info(`Copying boilerplate files...`);
     fs.copyFile(path.join(PKG_DIRECTORY, "templates", "basic", ".genezioignore"), path.join(projectDirectory, ".genezioignore"));
     fs.copyFile(path.join(PKG_DIRECTORY, "templates", "basic", ".gitignore"), path.join(projectDirectory, ".gitignore"));
     fs.copyFile(path.join(PKG_DIRECTORY, "templates", "basic", "README.md"), path.join(projectDirectory, "README.md"));
-    fs.copyFile(path.join(PKG_DIRECTORY, "templates", "basic", "tsconfig.json"), path.join(projectDirectory, "tsconfig.json"));
-    spinner.succeed(`Template files ${chalk.green("copied successfully!")}\n`);
+    // This is a temporary workaround
+    // If we are not providing a tsconfig.json file near the configuration file,
+    // genezio will create a default one, which is not desirable because it does not excludes the client sources
+    if (projectOptions.frontendLanguage === "typescript") {
+        fs.copyFile(path.join(PKG_DIRECTORY, "templates", "basic", "tsconfig.json"), path.join(projectDirectory, "tsconfig.json"));
+    }
+    spinner.succeed(`Boilerplate files ${chalk.green("copied successfully!")}\n`);
 
     // Copy server template
     spinner.info(`Copying server template files...`);
@@ -94,27 +82,9 @@ export async function createProjectFromTemplate(projectOptions: CreateProjectOpt
 
     // Create genezio.yaml with mustache template
     spinner.info(`Creating genezio.yaml...`);
-
-    const backendLanguageExtension = await translateFromLongLanguagesToExtensions(projectOptions.backendLanguage);
-    const frontendLanguageExtension = await translateFromLongLanguagesToExtensions(projectOptions.frontendLanguage);
-    const view: GenezioYamlTemplate = {
-        app_name: projectOptions.projectName,
-        cloud_provider: projectOptions.projectConfiguration.cloudProvider,
-        region: projectOptions.projectConfiguration.region,
-        sdk_language: frontendLanguageExtension,
-        sdk_runtime: projectOptions.projectConfiguration.sdkRuntime,
-        sdk_path: projectOptions.projectConfiguration.sdkPath,
-        frontend_path: projectOptions.projectConfiguration.frontendPath,
-        frontend_subdomain: generateRandomSubdomain(),
-        scripts_prebackend: projectOptions.projectConfiguration.scripts.preBackend,
-        scripts_postbackend: projectOptions.projectConfiguration.scripts.postBackend,
-        scripts_prefrontend: projectOptions.projectConfiguration.scripts.preFrontend,
-        scripts_postfrontend: projectOptions.projectConfiguration.scripts.postFrontend,
-        index_class_path: path.join(".", "server", "task" + "." + backendLanguageExtension),
-        index_class_type: projectOptions.projectConfiguration.indexClassType,
-    }
-    const genezioYamlRendered = Mustache.render(genezioYamlMustacheTemplate, view);
-    fs.writeFileSync(path.join(projectDirectory, "genezio.yaml"), genezioYamlRendered);
+    await createGenezioConfigFile(projectOptions).catch((error) => {
+        throw error;
+    });
     spinner.succeed(`genezio.yaml ${chalk.green("created successfully!")}\n`);
 }
 
@@ -138,4 +108,42 @@ async function createProjectDirectory(projectDirectory: string) {
     spinner.succeed(
     `${projectDirectory} ${chalk.green("created successfully!")}\n`,
     );
+}
+
+async function createGenezioConfigFile(projectOptions: CreateProjectOptions) {
+    // const backendLanguageExtension = await translateFromLongLanguagesToExtensions(projectOptions.backendLanguage);
+    const frontendLanguageExtension = await translateFromLongLanguagesToExtensions(projectOptions.frontendLanguage);
+    const view: ProjectConfigurationView = {
+        app_name: projectOptions.projectName,
+        cloud_provider: projectOptions.projectConfiguration.cloudProvider,
+        region: projectOptions.projectConfiguration.region,
+        sdk_language: frontendLanguageExtension,
+        sdk_runtime: projectOptions.projectConfiguration.sdkRuntime,
+        sdk_path: projectOptions.projectConfiguration.sdkPath,
+        frontend_path: projectOptions.projectConfiguration.frontendPath,
+        frontend_subdomain: generateRandomSubdomain(),
+        prebackend: {
+            scripts_prebackend: projectOptions.projectConfiguration.scripts.preBackend,
+        },
+        postbackend: {
+            scripts_postbackend: projectOptions.projectConfiguration.scripts.postBackend
+        },
+        prefrontend: {
+            scripts_prefrontend: projectOptions.projectConfiguration.scripts.preFrontend
+        },
+        postfrontend: {
+            scripts_postfrontend: projectOptions.projectConfiguration.scripts.postFrontend
+        },
+        classes: [],
+    }
+
+    for (const element of projectOptions.projectConfiguration.classes) {
+        const classView: Class = {
+            path: element.path,
+            type: element.type,
+        }
+        view.classes.push(classView);
+    }
+    const configFileRendered = Mustache.render(genezioYamlMustacheTemplate, view);
+    fs.writeFileSync(path.join(projectOptions.projectName, "genezio.yaml"), configFileRendered);
 }

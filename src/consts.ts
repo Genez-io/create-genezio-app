@@ -34,12 +34,20 @@ export const DEFAULT_PROJECT_CONFIGURATION: ProjectConfigurationOptions = {
     sdkLanguage: "typescript",
     sdkRuntime: SDKRuntime.BROWSER,
     sdkPath: path.join(".", "client", "src", "sdk"),
-    frontendPath: path.join(".", "client", "src", "build"),
+    frontendPath: path.join(".", "client", "build"),
     frontendSubdomain: "",
-    indexClassPath: path.join(".", "server", "src", "index.ts"),
-    indexClassType: ClassType.JSONRPC,
+    classes: [
+        {
+            path: path.join(".", "server", "task.ts"),
+            type: ClassType.JSONRPC,
+        },
+        {
+            path: path.join(".", "server", "user.ts"),
+            type: ClassType.JSONRPC,
+        }
+    ],
     scripts: {
-        preBackend: "",
+        preBackend: "cd server && npm install",
         postBackend: "",
         preFrontend: "cd client && npm install && npm run build",
         postFrontend: "",
@@ -55,6 +63,6 @@ export const DEFAULT_PROJECT_OPTIONS: CreateProjectOptions = {
     authentication: "none",
     database: "none",
     initGit: true,
-    installDependencies: true,
+    installDependencies: false,
     projectConfiguration: DEFAULT_PROJECT_CONFIGURATION,
 }

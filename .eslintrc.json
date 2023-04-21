@@ -22,7 +22,8 @@
     "ignorePatterns": [
         "build/**/*",
         "node_modules/**/*",
-        "src/templates/**/*"
+        "src/templates/**/*",
+        "my-genezio-app/**/*"
     ],
     "rules": {
     }

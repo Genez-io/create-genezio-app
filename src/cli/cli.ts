@@ -7,7 +7,9 @@ import { initGitRepository } from "../helpers/initGitRepository.js";
 import { installDependencies } from "../helpers/installDependency.js";
 import log from "loglevel";
 import prefix from 'loglevel-plugin-prefix';
-import { CreateProjectOptions } from "../types/ProjectOptions.js";
+import path from "path";
+import { ClassType, CreateProjectOptions } from "../types/ProjectOptions.js";
+import { translateFromLongLanguagesToExtensions } from "../utils/translateFromLongLanguagesToExtensions.js";
 
 const program = new Command().name(CREATE_GENEZIO_APP);
 
@@ -82,6 +84,7 @@ program
     });
 
     // Create project
+    const backendLanguageExtension = await translateFromLongLanguagesToExtensions(backendLanguage);
     await createProject({
         projectName: projectDirectory,
         backendLanguage: backendLanguage,
@@ -92,7 +95,19 @@ program
         database: DEFAULT_PROJECT_OPTIONS.database,
         initGit: initGit,
         installDependencies: installDependencies,
-        projectConfiguration: DEFAULT_PROJECT_CONFIGURATION,
+        projectConfiguration: {
+            ...DEFAULT_PROJECT_CONFIGURATION,
+            classes:[
+                {
+                    path: path.join(".", "server", "task" +"." + backendLanguageExtension),
+                    type: ClassType.JSONRPC,
+                },
+                {
+                    path: path.join(".", "server", "user" +"." + backendLanguageExtension),
+                    type: ClassType.JSONRPC,
+                }
+        ]
+        },
     }).catch((error) => {
         log.error(error);
     });

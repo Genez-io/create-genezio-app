@@ -5,14 +5,14 @@ const taskSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  ownerId: {
+    type: String,
+    required: true
+  },
   solved: {
     type: Boolean,
     required: true,
     default: false
-  },
-  token: {
-    type: String,
-    required: true
   },
   date: {
     type: Date,
