@@ -1,33 +1,45 @@
-export type CreateProjectOptions = {
+export type ProjectConfigurationOptions = {
+    cloudProvider: CloudProvider;
+    region: Region;
     projectName: string;
-    backendLanguage: string;
-    frontendLanguage: string;
-    frontendFramework: string;
-    packageManager: string;
+    backendOptions?: BackendOptions;
+    frontendOptions?: FrontendOptions;
     authentication: string;
     database: string;
     initGit: boolean;
     installDependencies: boolean;
-    projectConfiguration: ProjectConfigurationOptions;
 }
 
-export type ProjectConfigurationOptions = {
-    cloudProvider: CloudProvider;
-    region: Region;
+export type BackendOptions = {
+    language: string;
+    packageManager: string;
+    scripts: ScriptsOptions;
+    classes: Class[];
+}
+
+export type FrontendOptions = {
+    language: string;
+    framework: string;
+    packageManager: string;
+    sdkPath: string;
     sdkLanguage: string;
     sdkRuntime: SDKRuntime;
-    sdkPath: string;
     frontendPath: string;
     frontendSubdomain: string
-    classes: Class[];
     scripts: ScriptsOptions;
 }
 
 export type ScriptsOptions = {
-    preBackend: string;
-    postBackend: string;
-    preFrontend: string;
-    postFrontend: string;
+    preBackend?: string;
+    postBackend?: string;
+    preFrontend?: string;
+    postFrontend?: string;
+}
+
+export type Class = {
+    path: string;
+    name?: string;
+    type?: ClassType;
 }
 
 export type ProjectConfigurationView = {
@@ -40,23 +52,26 @@ export type ProjectConfigurationView = {
     frontend_path: string;
     frontend_subdomain: string;
     prebackend?: {
-        scripts_prebackend: string;
+        scripts_prebackend?: string;
     };
     postbackend?:  {
-        scripts_postbackend: string;
+        scripts_postbackend?: string;
     };
     prefrontend?: {
-        scripts_prefrontend: string;
+        scripts_prefrontend?: string;
     };
     postfrontend?:  {
-        scripts_postfrontend: string;
+        scripts_postfrontend?: string;
     };
-    classes: Class[];
+    classes: ClassView[];
 }
 
-export type Class = {
+export type ClassView = {
     path: string;
-    type: ClassType;
+    name?: {
+        value?: string;
+    };
+    type?: ClassType;
 }
 
 export enum CloudProvider {

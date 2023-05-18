@@ -1,11 +1,15 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
 const taskSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true
   },
-  ownerId: {
+  url: {
+    type: String,
+    required: false,
+  },
+  token: {
     type: String,
     required: true
   },

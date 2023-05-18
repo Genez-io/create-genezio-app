@@ -3,9 +3,9 @@ import { simpleGit } from "simple-git";
 import log from "loglevel";
 import path from "path";
 
-import { CreateProjectOptions } from "../types/ProjectOptions.js";
+import { ProjectConfigurationOptions } from "../types/ProjectOptions.js";
 
-export async function initGitRepository(projectOptions: CreateProjectOptions) {
+export async function initGitRepository(projectOptions: ProjectConfigurationOptions) {
     log.info("Initializing git repository.");
 
     if (!isGitInstalled()) {

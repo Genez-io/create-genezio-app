@@ -1,14 +1,14 @@
 import inquirer from 'inquirer';
 import { validateAppName } from '../utils/validateAppName.js';
-import { DEFAULT_PROJECT_OPTIONS, FRONTEND_FRAMEWORKS, LANGUAGES_LONG, Q_APP_NAME, Q_AUTHENTICATION, Q_BACKEND_PROGRAMMING_LANGUAGE, Q_FRONTEND_FRAMEWORK, Q_FRONTEND_PROGRAMMING_LANGUAGE, Q_GIT, Q_INSTALL_DEPENDENCIES, Q_OVERWRITE_DIRECTORY, Q_PACKAGE_MANAGER } from '../consts.js';
+import { DEFAULT_PROJECT_NAME, FRONTEND_FRAMEWORKS, LANGUAGES_LONG, Q_AUTHENTICATION, Q_BACKEND_PROGRAMMING_LANGUAGE, Q_FRONTEND_FRAMEWORK, Q_FRONTEND_PROGRAMMING_LANGUAGE, Q_GIT, Q_INSTALL_DEPENDENCIES, Q_OVERWRITE_DIRECTORY, Q_PROJECT_NAME } from '../consts.js';
 
-export async function promptAppName() {
+export async function promptProjectName() {
     const answers = await inquirer.prompt([
         {
             name: "appName",
             type: "input",
-            message: Q_APP_NAME,
-            default: DEFAULT_PROJECT_OPTIONS.projectName,
+            message: Q_PROJECT_NAME,
+            default: DEFAULT_PROJECT_NAME,
             validate: (input: string) => {
                 return validateAppName(input);
             },
@@ -38,7 +38,7 @@ export async function promptBackendLanguage() {
             type: "list",
             message: Q_BACKEND_PROGRAMMING_LANGUAGE,
             choices: LANGUAGES_LONG,
-            default: DEFAULT_PROJECT_OPTIONS.backendLanguage,
+            default: "typescript",
         }
     ])
     .then((answers) => {
@@ -63,7 +63,7 @@ export async function promptFrontendLanguage() {
             type: "list",
             message: Q_FRONTEND_PROGRAMMING_LANGUAGE,
             choices: LANGUAGES_LONG,
-            default: DEFAULT_PROJECT_OPTIONS.frontendLanguage,
+            default: "typescript",
         }
     ])
     .then((answers) => {
@@ -88,7 +88,7 @@ export async function promptFrontendFramework() {
             type: "list",
             message: Q_FRONTEND_FRAMEWORK,
             choices: FRONTEND_FRAMEWORKS,
-            default: DEFAULT_PROJECT_OPTIONS.frontendFramework,
+            default: "react",
         }
     ])
     .then((answers) => {
@@ -106,38 +106,13 @@ export async function promptFrontendFramework() {
     return answers.frontendFramework.toLowerCase();
 }
 
-export async function promptPackageManager() {
-    const answers = await inquirer.prompt([
-        {
-            name: "packageManager",
-            type: "list",
-            message: Q_PACKAGE_MANAGER,
-            choices: ["npm", "yarn"],
-            default: DEFAULT_PROJECT_OPTIONS.packageManager,
-        }
-    ])
-    .then((answers) => {
-        return answers;
-    })
-    .catch((error) => {
-        if (error.isTtyError) {
-            // Prompt couldn't be rendered in the current environment
-            throw new Error("Prompt couldn't be rendered in the current environment")
-        } else {
-            throw new Error(error)
-        }
-    });
-
-    return answers.packageManager;
-}
-
 export async function promptAuthentication() {
     const answers = await inquirer.prompt([
         {
             name: "authentication",
             type: "confirm",
             message: Q_AUTHENTICATION,
-            default: DEFAULT_PROJECT_OPTIONS.authentication,
+            default: "no",
         }
     ])
     .then((answers) => {
@@ -161,7 +136,7 @@ export async function promptInitGit() {
             name: "git",
             type: "confirm",
             message: Q_GIT,
-            default: DEFAULT_PROJECT_OPTIONS.initGit,
+            default: "yes",
         }
     ])
     .then((answers) => {
@@ -185,7 +160,7 @@ export async function promptInstallDependencies() {
             name: "installDependencies",
             type: "confirm",
             message: Q_INSTALL_DEPENDENCIES,
-            default: DEFAULT_PROJECT_OPTIONS.installDependencies,
+            default: "yes",
         }
     ])
     .then((answers) => {

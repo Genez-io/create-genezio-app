@@ -10,13 +10,24 @@ frontend:
   path: {{{frontend_path}}}
   subdomain: {{frontend_subdomain}}
 scripts:
-  preBackendDeploy: {{#prebackend}} {{{scripts_prebackend}}} {{/prebackend}}
-  postBackendDeploy: {{#postbackend}} {{{scripts_postbackend}}} {{/postbackend}}
-  preFrontendDeploy: {{#prefrontend}} {{{scripts_prefrontend}}} {{/prefrontend}}
-  postFrontendDeploy: {{#postfrontend}} {{{scripts_postfrontend}}} {{/postfrontend}}
+  {{#prebackend}}
+  preBackendDeploy: {{{scripts_prebackend}}}
+  {{/prebackend}}
+  {{#postbackend}}
+  postBackendDeploy: {{{scripts_postbackend}}}
+  {{/postbackend}}
+  {{#prefrontend}}
+  preFrontendDeploy: {{{scripts_prefrontend}}}
+  {{/prefrontend}}
+  {{#postfrontend}}
+  postFrontendDeploy: {{{scripts_postfrontend}}}
+  {{/postfrontend}}
 classes:
   {{#classes}}
   - path: {{{path}}}
+    {{#name}}
+    name: {{{value}}}
+    {{/name}}
     type: {{{type}}}
     methods: []
   {{/classes}}
