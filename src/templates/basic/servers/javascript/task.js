@@ -5,8 +5,9 @@ import { TaskModel } from "./models/task";
 /**
  * The Task server class that will be deployed on the genezio infrastructure.
  */
-export class Task {
+export class TaskService {
   constructor() {
+    mongoose.set("strictQuery", true);
     this.#connect();
   }
 
@@ -14,7 +15,6 @@ export class Task {
    * Private method used to connect to the DB.
    */
   #connect() {
-    mongoose.set("strictQuery", true);
     mongoose.connect(MONGO_DB_URI);
   }
 
@@ -31,7 +31,14 @@ export class Task {
   async getAllTasksByUser(token) {
     console.log(`Get all tasks by user request received with token ${token}`);
 
-    const tasks = await TaskModel.find({ token: token });
+    const tasks = (await TaskModel.find({ token: token })).map((task) => {
+      return {
+        title: task.title,
+        token: task.token.toString(),
+        id: task._id.toString(),
+        solved: task.solved,
+      };
+    });
 
     if (tasks.length === 0) {
       await TaskModel.create({
@@ -58,7 +65,14 @@ export class Task {
         url: "https://genez.io/blog/",
       });
 
-      const initTasks = await TaskModel.find({ token: token });
+      const initTasks = (await TaskModel.find({ token: token })).map((task) => {
+        return {
+          title: task.title,
+          token: task.token.toString(),
+          id: task._id.toString(),
+          solved: task.solved,
+        };
+      });
 
       return { success: true, tasks: initTasks };
     }
@@ -89,7 +103,7 @@ export class Task {
 
     return {
       success: true,
-      task: { title: title, _id: task._id.toString() },
+      task: { title: title, token: token.toString(), id: task._id.toString() },
     };
   }
 

@@ -128,14 +128,14 @@ class Tasks extends StatefulWidget {
 }
 
 class _TasksState extends State<Tasks> {
-  List<TaskModel> tasks = [];
+  List<Task> tasks = [];
 
   @override
   void initState() {
     super.initState();
 
     _getTasks().then((response) {
-      tasks.addAll(response);
+      tasks.addAll(response.tasks);
       // Update UI
       setState(() {
         tasks = tasks;
@@ -145,7 +145,7 @@ class _TasksState extends State<Tasks> {
     });
   }
 
-  Future<List<TaskModel>> _getTasks() async {
+  Future<GetTasksResponse> _getTasks() async {
     return TaskService.getAllTasksByUser(widget.token);
   }
 
@@ -173,29 +173,23 @@ class _TasksState extends State<Tasks> {
             ),
             child: ListTile(
               leading: Checkbox(
-                value: task.solved == "true" ? true : false,
+                value: task.solved,
                 onChanged: (value) {
                   final id = task.id;
                   final title = task.title;
-                  final url = task.url;
                   setState(() {
                     TaskService.updateTask(
-                        id, widget.token, title, url, value!.toString());
-                    task.solved = value.toString();
+                        id, widget.token, title, value!);
+                    task.solved = value;
                   });
                 },
               ),
               title: SelectableText(
                 task.title,
-                style: task.solved == "true"
+                style: task.solved == true
                     ? TextStyle(decoration: TextDecoration.lineThrough)
                     : null,
               ),
-              subtitle: SelectableText(task.url,
-                  style: task.solved == "true"
-                      ? TextStyle(decoration: TextDecoration.lineThrough)
-                      : null),
-              isThreeLine: true,
               trailing: PopupMenuButton(
                 icon: const Icon(Icons.more_vert),
                 itemBuilder: (context) => [
@@ -205,15 +199,13 @@ class _TasksState extends State<Tasks> {
                     onTap: () {
                       String taskId = task.id;
                       String taskName = task.title;
-                      String taskUrl = task.url;
                       Future.delayed(Duration.zero, () {
                         showDialog(
                           context: context,
                           builder: (context) => UpdateTaskAlertDialog(
                               token: widget.token,
                               taskId: taskId,
-                              taskName: taskName,
-                              taskUrl: taskUrl),
+                              taskName: taskName),
                         );
                       });
                     },
