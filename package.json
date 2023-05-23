@@ -1,6 +1,6 @@
 {
-  "name": "create-genezio-app",
-  "version": "1.0.0",
+  "name": "@genezio/create-genezio-app",
+  "version": "0.1.0",
   "description": "Start a full-stack genezio app",
   "main": "src/index.ts",
   "scripts": {
