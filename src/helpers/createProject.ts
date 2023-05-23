@@ -23,8 +23,8 @@ export async function createProjectFromTemplate(projectOptions: ProjectConfigura
 
     // Copy files from templates
     spinner.info(`Copying boilerplate files...`);
-    fs.copyFile(path.join(PKG_DIRECTORY, "templates", "basic", ".genezioignore"), path.join(projectDirectory, ".genezioignore"));
-    fs.copyFile(path.join(PKG_DIRECTORY, "templates", "basic", ".gitignore"), path.join(projectDirectory, ".gitignore"));
+    fs.copyFile(path.join(PKG_DIRECTORY, "templates", "basic", "_genezioignore"), path.join(projectDirectory, ".genezioignore"));
+    fs.copyFile(path.join(PKG_DIRECTORY, "templates", "basic", "_gitignore"), path.join(projectDirectory, ".gitignore"));
     fs.copyFile(path.join(PKG_DIRECTORY, "templates", "basic", "README.md"), path.join(projectDirectory, "README.md"));
     spinner.succeed(`Boilerplate files ${chalk.green("copied successfully!")}\n`);
 
@@ -43,6 +43,11 @@ export async function createProjectFromTemplate(projectOptions: ProjectConfigura
         default:
             throw new Error("Invalid backend language");
     }
+    // Check if file _gitignore exists in the server directory
+    if (fs.existsSync(path.join(projectDirectory, "server", "_gitignore"))) {
+        fs.renameSync(path.join(projectDirectory, "server", "_gitignore"), path.join(projectDirectory, "server", ".gitignore"));
+    }
+
     spinner.succeed(`Server template files ${chalk.green("copied successfully!")}\n`);
 
     // Copy client template files
@@ -61,6 +66,11 @@ export async function createProjectFromTemplate(projectOptions: ProjectConfigura
         default:
             throw new Error("Invalid frontend framework");
     }
+    // Check if file _gitignore exists in the client directory
+    if (fs.existsSync(path.join(projectDirectory, "client", "_gitignore"))) {
+        fs.renameSync(path.join(projectDirectory, "client", "_gitignore"), path.join(projectDirectory, "client", ".gitignore"));
+    }
+
     spinner.succeed(`Client template files ${chalk.green("copied successfully!")}\n`);
 
     // Create genezio.yaml with mustache template
