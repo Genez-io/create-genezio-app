@@ -11,17 +11,19 @@
 <br>
 
 <div align="center">
-<h1>create-genezio-app</h1>
-<h2>The easiest way to start a serverless full-stack application</h2>
+<h1>create-genezio-app</h1><h3>The easiest way to start a serverless full-stack application</h3>
 </div>
+
+<br>
 
 <div align="center">
 
-<!-- [![npm-downloads](https://img.shields.io/npm/dm/create-genezio-app.svg?style=flat&label=npm-downloads&color=62C353)](https://www.npmjs.com/package/create-genezio-app)
-
-[![npm-version](https://img.shields.io/npm/v/create-genezio-app.svg?style=flat&label=npm-package-version&color=62C353)](https://www.npmjs.com/package/create-genezio-app) -->
+[![build](https://github.com/genez-io/create-genezio-app/actions/workflows/build.yaml/badge.svg)](https://github.com/genez-io/create-genezio-app/actions/workflows/build.yaml)
 
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat&color=62C353)](https://github.com/Genez-io/create-genezio-app/blob/master/CONTRIBUTING.md)
+[![npm-version](https://img.shields.io/npm/v/@genezio/create-genezio-app.svg?style=flat&label=npm-package-version&color=62C353)](https://www.npmjs.com/package/@genezio/create-genezio-app)
+<!-- [![npm-downloads](https://img.shields.io/npm/dm/create-genezio-app.svg?style=flat&label=npm-downloads&color=62C353)](https://www.npmjs.com/package/create-genezio-app)
+-->
 
 </div>
 
@@ -58,11 +60,15 @@ You are welcome to integrate your own libraries to solve the needs of your appli
 
 # Getting started
 
+## Generate your template
+
 To start an application using `create-genezio-app` run the following command and answer the command prompt questions:
 
 ```bash
-npx create-genezio-app
+npx @genezio/create-genezio-app
 ```
+
+## Deploy with genezio
 
 To see magic happening, you can also deploy your application on a serverless infrastructure using `genezio`.
 
