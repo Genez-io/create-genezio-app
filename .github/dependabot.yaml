@@ -6,9 +6,9 @@
 version: 2
 updates:
   - package-ecosystem: "npm"
-    target-branch: "dev"
+    target-branch: "main"
     directory: "/"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
     schedule:
       interval: "weekly"
       day: "monday"
