@@ -9,6 +9,11 @@ import log from "loglevel";
 import prefix from 'loglevel-plugin-prefix';
 import path from "path";
 import { BackendOptions, Class, ClassType, CloudProvider, FrontendOptions, ProjectConfigurationOptions, Region, SDKRuntime, ScriptsOptions } from "../types/ProjectOptions.js";
+import { createRequire } from "module";
+
+const requireESM = createRequire(import.meta.url);
+const pjson = requireESM("../../package.json");
+const version = pjson.version;
 
 const program = new Command().name(CREATE_GENEZIO_APP);
 
@@ -27,7 +32,7 @@ program
   })
   .addHelpText("afterAll", " If you have any problems, do not hesitate to file an issue at: https://github.com/genez-io/create-genezio-app/issues/new")
   .argument("[project-directory]", "The name of the application as well as the name of the directory it will be created in.")
-  .version("1.0.0")
+  .version(version)
   .option("--logLevel <logLevel>", "set the log level (default: info)", "info")
   .action(async (projectDirectory: string) => {
     // If project directory is not provided as a CLI argument, ask the user for it
