@@ -15,7 +15,7 @@
 </div>
 
 > [!WARNING]  
-> `create-genezio-app` was depricated and now integrated in the Genezio CLI as the `genezio create` subcommand. Read more about how to use `genezio create` to boostrap new projects [here](https://genezio.com/docs/cli-tool/cli-commands/genezio-create/).
+> `create-genezio-app` was deprecated and now integrated in the Genezio CLI as the `genezio create` subcommand. Read more about how to use `genezio create` to boostrap new projects [here](https://genezio.com/docs/cli-tool/cli-commands/genezio-create/).
 
 <br>
 
