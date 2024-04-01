@@ -14,6 +14,9 @@
 <h1>create-genezio-app</h1><h3>The easiest way to start a serverless full-stack application</h3>
 </div>
 
+> [!WARNING]  
+> `create-genezio-app` was integrated in the Genezio CLI as the `genezio create` subcommand. Read more about how to use `genezio create` to boostrap new projects [here](https://genezio.com/docs/cli-tool/cli-commands/genezio-create/).
+
 <br>
 
 <div align="center">
